@@ -6,13 +6,13 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
+      <HintPath>$(MLAssemblyPath)\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
+    <Reference Include="MelonLoader">
+      <HintPath>$(MLAssemblyPath)\MelonLoader.dll</HintPath>
     </Reference>
     <Reference Include="PhotonUnityNetworking">
       <HintPath>$(GameAssemblyPath)\PhotonUnityNetworking.dll</HintPath>

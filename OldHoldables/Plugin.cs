@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
+﻿using MelonLoader;
 using GorillaNetworking;
 using HarmonyLib;
 using System.IO;
@@ -7,60 +6,31 @@ using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
 using System;
+using MelonLoader.Utils;
+using OldHoldables;
 
+[assembly: MelonInfo(typeof(OldHoldables.Plugin), PluginInfo.Name, PluginInfo.Version, PluginInfo.Author)]
+[assembly: MelonGame("Another Axiom", "Gorilla Tag")]
 namespace OldHoldables
 {
-    [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
-    [BepInDependency("org.legoandmars.gorillatag.utilla", "1.5.0")]
-    public class Plugin : BaseUnityPlugin
+    public class Plugin : MelonMod
     {
-        static ConfigEntry<bool> disableDropping;
-        bool IsSteamVR;
-        bool initialized = false;
-
-        void Awake()
+        public static new MelonPreferences_Category Config;
+        public static MelonPreferences_Entry<bool> disableDropping;
+        
+        public override void OnInitializeMelon()
         {
-            GorillaTagger.OnPlayerSpawned(GameInitialized);
-        }
+            Config = MelonPreferences.CreateCategory("OldHoldables");
 
-        void GameInitialized()
-        {
-            IsSteamVR = Traverse.Create(PlayFabAuthenticator.instance).Field("platform").GetValue().ToString().ToLower() == "steam";
-            initialized = true;
-        }
-
-        void OnEnable()
-        {
-            HarmonyPatches.ApplyHarmonyPatches();
-            disableDropping = Config.Bind("Input", "DisableDropping", false, "Turn off manual dropping altogether. Not recommended, but may be needed for Index controllers");
-        }
-
-        void OnDisable() => HarmonyPatches.RemoveHarmonyPatches();
-
-        public static bool RightStickClick = false;
-        private float DropTime;
-
-        void LateUpdate()
-        {
-            if (!initialized) return;
+            string configPath = Path.Combine(MelonEnvironment.UserDataDirectory, "OldHoldables.cfg");
+            Config.SetFilePath(configPath);
+            Config.LoadFromFile();
             
-            if (IsSteamVR)
-                RightStickClick = SteamVR_Actions.gorillaTag_RightJoystickClick.GetState(SteamVR_Input_Sources.RightHand);
-            else
-                ControllerInputPoller.instance.rightControllerDevice.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out RightStickClick);
-
-            if (!disableDropping.Value)
-            {
-                if (RightStickClick && (DropTime + 3) < Time.time) { DropManually(); }
-            }
-        }
-        void DropManually()
-        {
-            HarmonyPatches.SetGoingToChange = true;
-            EquipmentInteractor.instance.ReleaseLeftHand();
-            EquipmentInteractor.instance.ReleaseRightHand();
-            HarmonyPatches.SetGoingToChange = false;
-            DropTime = Time.time;
+            disableDropping = Config.CreateEntry("disableDropping", false, "Disable Dropping", "Turn off manual dropping altogether. Not recommended, but may be needed for Index controllers");
+            
+            GameObject root = new GameObject(PluginInfo.Name);
+            UnityEngine.Object.DontDestroyOnLoad(root);
+            root.AddComponent<OHManager>();
         }
     }
 }
