@@ -33,8 +33,7 @@ namespace OldHoldables
         {
             static bool Prefix(TransferrableObject __instance, ref bool __result)
             {
-                if (__instance.TryGetComponent(out Slingshot _) ||
-                    __instance.TryGetComponent(out ThrowableBug _) ||
+                if (__instance.TryGetComponent(out ThrowableBug _) ||
                     __instance.TryGetComponent(out ThrowableSetDressing _) ||
                     __instance.TryGetComponent(out DecorativeItem _)) return true;
                 if (!SetGoingToChange) __result = false;
@@ -47,8 +46,7 @@ namespace OldHoldables
         {
             static void Postfix(TransferrableObject __instance)
             {
-                if (!__instance.TryGetComponent(out Slingshot _) ||
-                    !__instance.TryGetComponent(out ThrowableBug _) ||
+                if (!__instance.TryGetComponent(out ThrowableBug _) ||
                     !__instance.TryGetComponent(out ThrowableSetDressing _) ||
                     !__instance.TryGetComponent(out DecorativeItem _))
                 {
@@ -67,13 +65,6 @@ namespace OldHoldables
                 }
             }
         }
-
-
-        /* TODO: Fix old auto-dropping code
-         * It's very broken now and I don't have the desire to fix it right now
-         * Slingshots should still be blacklisted but it
-         * probably won't automatically drop anything else
-         */
 
         [HarmonyPatch(typeof(EquipmentInteractor), "GetIsHolding")]
         class RopeHoldingPatch
